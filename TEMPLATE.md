@@ -3,7 +3,7 @@
 ## Listing
 
 - **Name:** LiteLLM v1 AI Gateway with Spend Tracking (LISTINGS.md name with the pinned major version inserted; LiteLLM tags releases as `v1.x.y`)
-- **Description (80 chars):** One OpenAI-compatible endpoint for 100+ LLMs with keys, budgets and rate limits. (unchanged)
+- **Description (80 chars):** One OpenAI-compatible API for 100+ LLMs with keys, budgets and rate limits. (unchanged)
 - **Category:** AI/ML
 - **Tags:** litellm, llm, ai-gateway, openai-compatible, proxy, budgets, rate-limiting
 

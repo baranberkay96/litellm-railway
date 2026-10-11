@@ -1,6 +1,6 @@
 {
   "name": "LiteLLM v1 AI Gateway with Spend Tracking",
-  "description": "One OpenAI-compatible endpoint for 100+ LLMs with keys, budgets and rate limits.",
+  "description": "One OpenAI-compatible API for 100+ LLMs with keys, budgets and rate limits.",
   "category": "AI/ML",
   "tags": [
     "litellm",
