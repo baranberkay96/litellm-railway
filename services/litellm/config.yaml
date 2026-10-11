@@ -1,0 +1,37 @@
+# LiteLLM proxy configuration for the Railway template.
+#
+# Models are added in the Admin UI (/ui) and stored encrypted in Postgres
+# (STORE_MODEL_IN_DB=True). If you prefer config-as-code, fork the template and
+# add a `model_list:` section here. All secrets come from environment variables.
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/DATABASE_URL
+  store_model_in_db: true
+  # Write spend logs to Postgres in batches every 60 s instead of per request.
+  proxy_batch_write_at: 60
+  # Prisma connections per worker process (NUM_WORKERS x replicas x this value).
+  database_connection_pool_limit: 10
+
+litellm_settings:
+  # Upstream default is 6000 s; 10 minutes is enough for long completions.
+  request_timeout: 600
+  json_logs: true
+  # Redis-backed response cache. LITELLM_CACHE_MODE=default_off makes it opt-in per
+  # request, so identical prompts are not silently answered from cache.
+  cache: true
+  cache_params:
+    type: redis
+    host: os.environ/REDIS_HOST
+    port: os.environ/REDIS_PORT
+    password: os.environ/REDIS_PASSWORD
+    mode: os.environ/LITELLM_CACHE_MODE
+    ttl: 3600
+
+router_settings:
+  # Shared router state in Redis: rpm/tpm limits, cooldowns and deployment health
+  # stay consistent across NUM_WORKERS processes and Railway replicas.
+  routing_strategy: simple-shuffle
+  redis_host: os.environ/REDIS_HOST
+  redis_port: os.environ/REDIS_PORT
+  redis_password: os.environ/REDIS_PASSWORD

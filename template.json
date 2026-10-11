@@ -1,0 +1,277 @@
+{
+  "name": "LiteLLM v1 AI Gateway with Spend Tracking",
+  "description": "One OpenAI-compatible endpoint for 100+ LLMs with keys, budgets and rate limits.",
+  "category": "AI/ML",
+  "tags": [
+    "litellm",
+    "llm",
+    "ai-gateway",
+    "openai-compatible",
+    "proxy",
+    "budgets",
+    "rate-limiting"
+  ],
+  "upstream": {
+    "repo": "BerriAI/litellm",
+    "version": "v1.104.2",
+    "checked": "2026-10-10"
+  },
+  "services": {
+    "LiteLLM": {
+      "icon": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/litellm.svg",
+      "source": {
+        "repo": "baranberkay96/litellm-railway",
+        "rootDirectory": "/services/litellm"
+      },
+      "startCommand": null,
+      "preDeployCommand": null,
+      "healthcheckPath": "/health/readiness",
+      "healthcheckTimeout": 300,
+      "restartPolicyType": "ON_FAILURE",
+      "restartPolicyMaxRetries": 10,
+      "numReplicas": 1,
+      "cronSchedule": null,
+      "publicDomain": true,
+      "targetPort": 4000,
+      "tcpProxy": null,
+      "volume": null,
+      "variables": {
+        "PORT": {
+          "defaultValue": "4000",
+          "description": "HTTP port of the proxy and Admin UI (public domain target).",
+          "required": false
+        },
+        "HOST": {
+          "defaultValue": "::",
+          "description": "Bind address; :: accepts IPv4 and IPv6 so other Railway services can call the gateway privately.",
+          "required": false
+        },
+        "NUM_WORKERS": {
+          "defaultValue": "2",
+          "description": "Uvicorn worker processes. ~0.6-1 GB RAM each; for more throughput prefer adding replicas.",
+          "required": false
+        },
+        "DATABASE_URL": {
+          "defaultValue": "${{Postgres.DATABASE_URL}}",
+          "description": "Postgres for models, virtual keys, teams, budgets and spend logs. Migrations run on start.",
+          "required": false
+        },
+        "LITELLM_MASTER_KEY": {
+          "defaultValue": "sk-${{secret(48, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+          "description": "Admin API key (must start with sk-). Use it to create virtual keys; keep private.",
+          "required": false
+        },
+        "LITELLM_SALT_KEY": {
+          "defaultValue": "sk-${{secret(48, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+          "description": "Encrypts provider credentials stored in Postgres. Generated once; never change it after adding models.",
+          "required": false
+        },
+        "UI_USERNAME": {
+          "defaultValue": "admin",
+          "description": "Admin UI username (/ui).",
+          "required": false
+        },
+        "UI_PASSWORD": {
+          "defaultValue": "${{secret(24, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+          "description": "Admin UI password. Generated; read it from this variable.",
+          "required": false
+        },
+        "STORE_MODEL_IN_DB": {
+          "defaultValue": "True",
+          "description": "Lets you add and edit models from the Admin UI (stored encrypted in Postgres).",
+          "required": false
+        },
+        "REDIS_HOST": {
+          "defaultValue": "${{Redis.REDISHOST}}",
+          "description": "Redis host for response caching and shared router state (rate limits, cooldowns) across workers/replicas.",
+          "required": false
+        },
+        "REDIS_PORT": {
+          "defaultValue": "${{Redis.REDISPORT}}",
+          "description": "Redis port.",
+          "required": false
+        },
+        "REDIS_PASSWORD": {
+          "defaultValue": "${{Redis.REDIS_PASSWORD}}",
+          "description": "Redis password.",
+          "required": false
+        },
+        "LITELLM_CACHE_MODE": {
+          "defaultValue": "default_off",
+          "description": "Response cache mode: default_off = opt-in per request (cache: {use-cache: true}); default_on = cache every identical request.",
+          "required": false
+        },
+        "LITELLM_MODE": {
+          "defaultValue": "PRODUCTION",
+          "description": "Production mode: no .env loading inside the container.",
+          "required": false
+        },
+        "LITELLM_LOG": {
+          "defaultValue": "INFO",
+          "description": "Log level (DEBUG, INFO, WARNING, ERROR). Use ERROR at high request volume.",
+          "required": false
+        },
+        "RAILWAY_DEPLOYMENT_DRAINING_SECONDS": {
+          "defaultValue": "120",
+          "description": "Seconds the old deployment keeps serving in-flight (streaming) requests during a redeploy.",
+          "required": false
+        },
+        "OPENAI_API_KEY": {
+          "defaultValue": "",
+          "description": "Optional. Default OpenAI key used when a model has no key of its own.",
+          "required": false
+        },
+        "ANTHROPIC_API_KEY": {
+          "defaultValue": "",
+          "description": "Optional. Default Anthropic key.",
+          "required": false
+        },
+        "GEMINI_API_KEY": {
+          "defaultValue": "",
+          "description": "Optional. Default Google AI Studio (Gemini) key.",
+          "required": false
+        },
+        "OPENROUTER_API_KEY": {
+          "defaultValue": "",
+          "description": "Optional. Default OpenRouter key.",
+          "required": false
+        }
+      }
+    },
+    "Postgres": {
+      "icon": "https://devicons.railway.app/i/postgresql.svg",
+      "source": {
+        "image": "ghcr.io/railwayapp-templates/postgres-ssl:18"
+      },
+      "startCommand": null,
+      "preDeployCommand": null,
+      "healthcheckPath": null,
+      "healthcheckTimeout": null,
+      "restartPolicyType": "ON_FAILURE",
+      "restartPolicyMaxRetries": 10,
+      "numReplicas": 1,
+      "cronSchedule": null,
+      "publicDomain": false,
+      "targetPort": null,
+      "tcpProxy": null,
+      "volume": {
+        "mountPath": "/var/lib/postgresql/data"
+      },
+      "variables": {
+        "PGDATA": {
+          "defaultValue": "/var/lib/postgresql/data/pgdata",
+          "description": "Location where the database will be initialized",
+          "required": false
+        },
+        "PGHOST": {
+          "defaultValue": "${{RAILWAY_PRIVATE_DOMAIN}}",
+          "description": "Railway Private Domain Name.",
+          "required": false
+        },
+        "PGPORT": {
+          "defaultValue": "5432",
+          "description": "Port to connect to Postgres.",
+          "required": false
+        },
+        "PGUSER": {
+          "defaultValue": "${{ POSTGRES_USER }}",
+          "description": "Required variable for Data panel",
+          "required": false
+        },
+        "PGDATABASE": {
+          "defaultValue": "${{POSTGRES_DB}}",
+          "description": "Required variable for the data panel.",
+          "required": false
+        },
+        "PGPASSWORD": {
+          "defaultValue": "${{POSTGRES_PASSWORD}}",
+          "description": "Required variable for Data panel",
+          "required": false
+        },
+        "POSTGRES_DB": {
+          "defaultValue": "railway",
+          "description": "Default database created when image is started.",
+          "required": false
+        },
+        "DATABASE_URL": {
+          "defaultValue": "postgresql://${{PGUSER}}:${{POSTGRES_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:5432/${{PGDATABASE}}",
+          "description": "URL to connect to Postgres database.",
+          "required": false
+        },
+        "POSTGRES_USER": {
+          "defaultValue": "postgres",
+          "description": "User to connect to Postgres DB",
+          "required": false
+        },
+        "SSL_CERT_DAYS": {
+          "defaultValue": "820",
+          "description": "SSL certificate expiry in days.",
+          "required": false
+        },
+        "POSTGRES_PASSWORD": {
+          "defaultValue": "${{ secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\") }}",
+          "description": "Password to connect to DB",
+          "required": false
+        },
+        "RAILWAY_DEPLOYMENT_DRAINING_SECONDS": {
+          "defaultValue": "60",
+          "description": "Allow Postgres to cleanly shut down",
+          "required": false
+        }
+      }
+    },
+    "Redis": {
+      "icon": "https://cdn.sanity.io/images/sy1jschh/production/0ce0bfdcfbdbf69662b1116671f97c2dd788b655-157x157.svg",
+      "source": {
+        "image": "redis:8.2"
+      },
+      "startCommand": "/bin/sh -c \"rm -rf $RAILWAY_VOLUME_MOUNT_PATH/lost+found/ && exec docker-entrypoint.sh redis-server --requirepass $REDIS_PASSWORD --save 60 1 --dir $RAILWAY_VOLUME_MOUNT_PATH\"",
+      "preDeployCommand": null,
+      "healthcheckPath": null,
+      "healthcheckTimeout": null,
+      "restartPolicyType": "ON_FAILURE",
+      "restartPolicyMaxRetries": 10,
+      "numReplicas": 1,
+      "cronSchedule": null,
+      "publicDomain": false,
+      "targetPort": null,
+      "tcpProxy": null,
+      "volume": {
+        "mountPath": "/data"
+      },
+      "variables": {
+        "REDISHOST": {
+          "defaultValue": "${{RAILWAY_PRIVATE_DOMAIN}}",
+          "description": "Private network hostname of the Redis service, only resolvable from services in the same environment",
+          "required": false
+        },
+        "REDISPORT": {
+          "defaultValue": "6379",
+          "description": "Port that Redis listens on",
+          "required": false
+        },
+        "REDISUSER": {
+          "defaultValue": "default",
+          "description": "Username for authenticating with Redis",
+          "required": false
+        },
+        "REDIS_URL": {
+          "defaultValue": "redis://${{ REDISUSER }}:${{ REDIS_PASSWORD }}@${{ REDISHOST }}:${{ REDISPORT }}",
+          "description": "Connection string for connecting to Redis using the private network",
+          "required": false
+        },
+        "REDISPASSWORD": {
+          "defaultValue": "${{REDIS_PASSWORD}}",
+          "description": "Alias of REDIS_PASSWORD for clients that expect the unseparated name",
+          "required": false
+        },
+        "REDIS_PASSWORD": {
+          "defaultValue": "${{ secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\") }}",
+          "description": "Randomly generated password for authenticating with Redis",
+          "required": false
+        }
+      }
+    }
+  },
+  "buckets": []
+}
