@@ -40,9 +40,9 @@ The LiteLLM proxy is a Python service that translates OpenAI-style requests to e
 **First login**
 
 1. Wait for the LiteLLM healthcheck (`/health/readiness`) to pass.
-2. Open `https://<your-domain>/ui` and sign in with `UI_USERNAME` (`admin`) and the generated `UI_PASSWORD` from the LiteLLM service variables.
+2. Open `https://{your-domain}/ui` and sign in with `UI_USERNAME` (`admin`) and the generated `UI_PASSWORD` from the LiteLLM service variables.
 3. Add a model under Models (paste the provider key there, or set the optional `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` / `GEMINI_API_KEY` / `OPENROUTER_API_KEY` variables).
-4. Create a virtual key and call `https://<your-domain>/v1/chat/completions` with it. Keep `LITELLM_MASTER_KEY` for administration only.
+4. Create a virtual key and call `https://{your-domain}/v1/chat/completions` with it. Keep `LITELLM_MASTER_KEY` for administration only.
 
 **Caching:** the Redis cache is opt-in per request by default (`LITELLM_CACHE_MODE=default_off`); send `"cache": {"use-cache": true}` or set the variable to `default_on`.
 
