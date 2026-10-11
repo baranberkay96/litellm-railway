@@ -1,6 +1,6 @@
 # Deploy and Host LiteLLM with Railway
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/litellm-v1-ai-gateway-with-spend-trackin)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/litellm-v1-ai-gateway-with-spend-trackin?referralCode=20H68q)
 
 LiteLLM is an open-source AI gateway that puts OpenAI, Anthropic, Gemini, Bedrock, Azure, OpenRouter and 100+ other model providers behind one OpenAI-compatible API. This community template runs the LiteLLM proxy with Postgres for keys and spend tracking and Redis for caching and shared rate limits.
 
